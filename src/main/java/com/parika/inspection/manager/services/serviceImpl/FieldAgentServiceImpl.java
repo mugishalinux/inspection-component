@@ -4,27 +4,30 @@ import com.parika.inspection.manager.exceptions.ApiRequestException;
 import com.parika.inspection.manager.models.FieldAgentRole;
 import com.parika.inspection.manager.models.FieldAgents;
 import com.parika.inspection.manager.models.Profiles;
-import com.parika.inspection.manager.repositories.FieldAgentRoleRepository;
-import com.parika.inspection.manager.repositories.FieldAgentsRepo;
-import com.parika.inspection.manager.repositories.ProfilesRepo;
-import com.parika.inspection.manager.repositories.VehicleRepo;
+import com.parika.inspection.manager.models.Status;
+import com.parika.inspection.manager.repositories.*;
 import com.parika.inspection.manager.services.FieldAgentService;
 import com.parika.inspection.manager.util.FieldAgentInputHandel;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FieldAgentServiceImpl implements FieldAgentService {
     private FieldAgentRoleRepository fieldAgentRoleRepository;
     private ProfilesRepo profilesRepo;
     private FieldAgentsRepo fieldAgentsRepo;
+    private StatusesRepo statusesRepo;
 
-    public FieldAgentServiceImpl(FieldAgentRoleRepository fieldAgentRoleRepository, ProfilesRepo profilesRepo, FieldAgentsRepo fieldAgentsRepo) {
+    public FieldAgentServiceImpl(FieldAgentRoleRepository fieldAgentRoleRepository, ProfilesRepo profilesRepo, FieldAgentsRepo fieldAgentsRepo, StatusesRepo statusesRepo) {
+        super();
         this.fieldAgentRoleRepository = fieldAgentRoleRepository;
         this.profilesRepo = profilesRepo;
         this.fieldAgentsRepo = fieldAgentsRepo;
+        this.statusesRepo = statusesRepo;
     }
 
     @Override
@@ -45,25 +48,48 @@ public class FieldAgentServiceImpl implements FieldAgentService {
 
             //check if field agent role id exist into database
             FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(fieldAgentInputHandel.getRoleId()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
-
+            //check if status id exist
+            Status status = statusesRepo.findById(fieldAgentInputHandel.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
 
             FieldAgents fieldAgent = new FieldAgents();
             fieldAgent.setProfiles(profilesExist);
             fieldAgent.setRoleId(fieldAgentRoleExist);
             fieldAgent.setRegistrationDate(LocalDateTime.now());
-            fieldAgent.setStatusId(fieldAgentInputHandel.getStatusId());
+            fieldAgent.setStatus(status);
 
             fieldAgent.setCreatedBy(fieldAgentInputHandel.getCreatedBy());
             fieldAgent.setUpdatedBy(fieldAgentInputHandel.getCreatedBy());
-            fieldAgent.setCreatedAt(LocalDateTime.now());
-            fieldAgent.setUpdatedAt(LocalDateTime.now());
+            fieldAgent.setCreatedOnDt(LocalDateTime.now());
+            fieldAgent.setUpdatedOnDt(LocalDateTime.now());
             return fieldAgentsRepo.save(fieldAgent);
         }
     }
 
     @Override
-    public List<FieldAgents> getAllFieldAgents() {
-        return fieldAgentsRepo.findAll();
+    public Page<FieldAgents> getAllFieldAgents(Optional<Integer> profile, Optional<Integer> roleId, int page, int sizePage, String sortBy) {
+        if(profile.isPresent() && !roleId.isPresent()){
+            //check if profile exist into database
+            Profiles profilesExist = profilesRepo.findById(profile.get()).orElseThrow(()->new ApiRequestException("This Profile don't exist in our database"));
+            Pageable pageable = PageRequest.of(page, sizePage);
+            Slice<FieldAgents> slicedResult = new PageImpl<>(fieldAgentsRepo.findByProfiles(profilesExist,pageable));
+            return new PageImpl<>(slicedResult.getContent());
+        } else if (!profile.isPresent() && roleId.isPresent()) {
+            //check if field agent role id exist into database
+            FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(roleId.get()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
+            Pageable pageable = PageRequest.of(page, sizePage);
+            Slice<FieldAgents> slicedResult = new PageImpl<>(fieldAgentsRepo.findByRoleId(fieldAgentRoleExist,pageable));
+            return new PageImpl<>(slicedResult.getContent());
+        } else if (profile.isPresent() && roleId.isPresent()) {
+            //check if field agent role id exist into database
+            FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(roleId.get()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
+            //check if profile exist into database
+            Profiles profilesExist = profilesRepo.findById(profile.get()).orElseThrow(()->new ApiRequestException("This Profile don't exist in our database"));
+            Pageable pageable = PageRequest.of(page, sizePage);
+            Slice<FieldAgents> slicedResult = new PageImpl<>(fieldAgentsRepo.findByProfilesAndRoleId(profilesExist,fieldAgentRoleExist,pageable));
+            return new PageImpl<>(slicedResult.getContent());
+        }else {
+            return fieldAgentsRepo.findAll(PageRequest.of(page,sizePage , Sort.Direction.ASC ,sortBy));
+        }
     }
 
     @Override
@@ -92,16 +118,18 @@ public class FieldAgentServiceImpl implements FieldAgentService {
 
             //check if field agent role id exist into database
             FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(fieldAgentInputHandel.getRoleId()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
+            //check if status id exist
+            Status status = statusesRepo.findById(fieldAgentInputHandel.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
 
             fieldAgent.setProfiles(profilesExist);
             fieldAgent.setRoleId(fieldAgentRoleExist);
-            fieldAgent.setRegistrationDate(fieldAgent.getCreatedAt());
-            fieldAgent.setStatusId(fieldAgentInputHandel.getStatusId());
+            fieldAgent.setRegistrationDate(fieldAgent.getCreatedOnDt());
+            fieldAgent.setStatus(status);
 
             fieldAgent.setCreatedBy(fieldAgent.getCreatedBy());
             fieldAgent.setUpdatedBy(fieldAgentInputHandel.getUpdatedBy());
-            fieldAgent.setCreatedAt(fieldAgent.getCreatedAt());
-            fieldAgent.setUpdatedAt(LocalDateTime.now());
+            fieldAgent.setCreatedOnDt(fieldAgent.getCreatedOnDt());
+            fieldAgent.setUpdatedOnDt(LocalDateTime.now());
             return fieldAgentsRepo.save(fieldAgent);
         }
     }

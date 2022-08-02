@@ -21,9 +21,4 @@ public class Cell {
     @ManyToOne(cascade = CascadeType.MERGE , fetch = FetchType.LAZY)
     @JoinColumn(name = "sector_id")
     private Sector sector;
-//    private int code;
-//    private String status;
-//    private String createdBy;
-//    private LocalDate createdAt = LocalDate.now();
-//    private LocalDate updatedAt = LocalDate.now();
 }

@@ -9,8 +9,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -29,8 +30,13 @@ public class ParkingInspectionsController {
     }
     @ApiOperation(value="Retrieve a list of Parking Inspections")
     @GetMapping()
-    List<ParkingInspections> getAllParkingInspections(){
-        return parkingInspectionService.getAllParkingInspections();
+    Page<ParkingInspections> getAllParkingInspections(@RequestParam Optional<Integer> slotId,
+                                                      @RequestParam Optional<Integer> fieldAgentId,
+                                                      @RequestParam Optional<Integer> vehicleId,
+                                                      @RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "10") int sizePage,
+                                                      @RequestParam(defaultValue = "id") String sortBy){
+        return parkingInspectionService.getAllParkingInspections(slotId,fieldAgentId,vehicleId,page,sizePage,sortBy);
     }
 
     @ApiOperation(value="Retrieve single Parking Inspections by using ID")

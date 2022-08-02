@@ -21,9 +21,4 @@ public class District {
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "province_id")
     private Province province;
-//    private int code;
-//    private String status;
-//    private String createdBy;
-//    private LocalDate createdAt = LocalDate.now();
-//    private LocalDate updatedAt = LocalDate.now();
 }

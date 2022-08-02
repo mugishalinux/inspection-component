@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -26,8 +26,10 @@ public class FieldAgentRoleController {
     }
     @ApiOperation(value="Retrieve a list of Field Agent Role")
     @GetMapping()
-    List<FieldAgentRole> getAllFieldAgentRole(){
-        return fieldAgentRoleService.getAllFieldAgentRole();
+    Page<FieldAgentRole> getAllFieldAgentRole(@RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "10") int sizePage,
+                                              @RequestParam(defaultValue = "id") String sortBy){
+        return fieldAgentRoleService.getAllFieldAgentRole(page,sizePage,sortBy);
     }
 
     @ApiOperation(value="Retrieve single Field Agent Role by using ID")

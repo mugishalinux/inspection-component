@@ -8,8 +8,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -28,8 +29,12 @@ public class FieldAgentsController {
     }
     @ApiOperation(value="Retrieve a list of Field Agent")
     @GetMapping()
-    List<FieldAgents> getAllFieldAgents(){
-        return fieldAgentService.getAllFieldAgents();
+    Page<FieldAgents> getAllFieldAgents(@RequestParam Optional<Integer> profileId,
+                                        @RequestParam Optional<Integer> roleId,
+                                        @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int sizePage,
+                                        @RequestParam(defaultValue = "id") String sortBy){
+        return fieldAgentService.getAllFieldAgents(profileId,roleId,page,sizePage,sortBy);
     }
 
     @ApiOperation(value="Retrieve single Field Agent by using ID")

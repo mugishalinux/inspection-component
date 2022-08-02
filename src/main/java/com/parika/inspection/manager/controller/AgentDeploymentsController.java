@@ -8,8 +8,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -29,8 +30,12 @@ public class AgentDeploymentsController {
     }
     @ApiOperation(value="Retrieve a list of Agent Deployment Role")
     @GetMapping()
-    List<AgentDeployments> getAllAgentDeployments(){
-        return agentDeploymentService.getAllAgentDeployments();
+    Page<AgentDeployments> getAllAgentDeployments(@RequestParam Optional<Integer> fieldAgents,
+                                                  @RequestParam Optional<Integer> parkingAreaId,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int sizePage,
+                                                  @RequestParam(defaultValue = "id") String sortBy){
+        return agentDeploymentService.getAllAgentDeployments(fieldAgents,parkingAreaId,page,sizePage,sortBy);
     }
 
     @ApiOperation(value="Retrieve single Agent Deployment by using ID")

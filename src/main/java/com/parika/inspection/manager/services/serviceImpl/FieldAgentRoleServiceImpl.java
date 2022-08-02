@@ -1,9 +1,13 @@
 package com.parika.inspection.manager.services.serviceImpl;
-
+import com.parika.inspection.manager.models.Status;
+import com.parika.inspection.manager.repositories.StatusesRepo;
+import org.springframework.data.domain.Page;
 import com.parika.inspection.manager.exceptions.ApiRequestException;
 import com.parika.inspection.manager.models.FieldAgentRole;
 import com.parika.inspection.manager.repositories.FieldAgentRoleRepository;
 import com.parika.inspection.manager.services.FieldAgentRoleService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,10 +16,12 @@ import java.util.List;
 @Service
 public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
     private FieldAgentRoleRepository fieldAgentRoleRepository;
+    private StatusesRepo statusesRepo;
 
-    public FieldAgentRoleServiceImpl(FieldAgentRoleRepository fieldAgentRoleRepository) {
+    public FieldAgentRoleServiceImpl(FieldAgentRoleRepository fieldAgentRoleRepository, StatusesRepo statusesRepo) {
         super();
         this.fieldAgentRoleRepository = fieldAgentRoleRepository;
+        this.statusesRepo = statusesRepo;
     }
 
     @Override
@@ -23,21 +29,24 @@ public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
 
         if(fieldAgentRole.getRoleName() == null){
             throw new ApiRequestException("please field agent name");
-        } else if (fieldAgentRole.getStatusId() == 0) {
+        } else if (fieldAgentRole.getStatus() == null) {
             throw new ApiRequestException("please provide the status id");
         } else if (fieldAgentRole.getCreatedBy() == null) {
             throw new ApiRequestException("please provide the creator name");
         }else {
+            //check if status id exist
+            Status status = statusesRepo.findById(fieldAgentRole.getStatus().getId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
+            fieldAgentRole.setStatus(status);
             fieldAgentRole.setUpdatedBy(fieldAgentRole.getCreatedBy());
-            fieldAgentRole.setCreatedAt(LocalDateTime.now());
-            fieldAgentRole.setUpdatedAt(LocalDateTime.now());
+            fieldAgentRole.setCreatedOnDt(LocalDateTime.now());
+            fieldAgentRole.setUpdatedOnDt(LocalDateTime.now());
             return fieldAgentRoleRepository.save(fieldAgentRole);
         }
     }
 
     @Override
-    public List<FieldAgentRole> getAllFieldAgentRole() {
-        return fieldAgentRoleRepository.findAll();
+    public Page<FieldAgentRole> getAllFieldAgentRole(int page, int sizePage, String sortBy) {
+        return fieldAgentRoleRepository.findAll(PageRequest.of(page,sizePage , Sort.Direction.ASC ,sortBy));
     }
 
     @Override
@@ -53,17 +62,19 @@ public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
 
         if(fieldAgentRole.getRoleName() == null){
             throw new ApiRequestException("please field agent name");
-        } else if (fieldAgentRole.getStatusId() == 0) {
+        } else if (fieldAgentRole.getStatus() == null) {
             throw new ApiRequestException("please provide the status id");
         } else if (fieldAgentRole.getCreatedBy() == null) {
             throw new ApiRequestException("please provide the creator name");
         }else {
+            //check if status id exist
+            Status status = statusesRepo.findById(fieldAgentRole.getStatus().getId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
             fieldAgentRoleExist.setRoleName(fieldAgentRole.getRoleName());
-            fieldAgentRoleExist.setStatusId(fieldAgentRole.getStatusId());
+            fieldAgentRole.setStatus(status);
             fieldAgentRoleExist.setCreatedBy(fieldAgentRoleExist.getCreatedBy());
             fieldAgentRoleExist.setUpdatedBy(fieldAgentRole.getUpdatedBy());
-            fieldAgentRoleExist.setCreatedAt(fieldAgentRoleExist.getCreatedAt());
-            fieldAgentRoleExist.setUpdatedAt(LocalDateTime.now());
+            fieldAgentRoleExist.setCreatedOnDt(fieldAgentRoleExist.getCreatedOnDt());
+            fieldAgentRoleExist.setUpdatedOnDt(LocalDateTime.now());
             return fieldAgentRoleRepository.save(fieldAgentRoleExist);
         }
     }

@@ -15,10 +15,7 @@ import java.time.LocalTime;
 @Entity
 @ToString
 @Table(name = "parking_inspections")
-public class ParkingInspections {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+public class ParkingInspections extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "slot_id")
     private ParkingSlot slotId;
@@ -36,13 +33,4 @@ public class ParkingInspections {
     private LocalDateTime inspectionTime;
     @Column(name = "inspectionCallTimeout")
     private LocalDateTime inspectionCallTimeout;
-    private int statusId;
-    @Column(name = "created_by")
-    private String createdBy;
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-    @Column(name = "updated_by")
-    private String updatedBy;
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
 }

@@ -6,15 +6,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
 @Entity
 @ToString
-@Table(name = "vehicle_brand")
-public class VehicleBrand extends BaseEntity{
-    @Column(name = "Brand_Desc")
-    private String brandDesc;
+@Table(name = "document_type")
+public class DocumentType extends BaseEntity{
+    @Column(name = "document_type_desc")
+    private String documentTypeDesc;
 }

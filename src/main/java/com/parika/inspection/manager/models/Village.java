@@ -21,9 +21,4 @@ public class Village {
     @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
     @JoinColumn(name = "cell_id")
     private Cell cell;
-//    private int code;
-//    private String status;
-//    private String createdBy;
-//    private LocalDate createdAt = LocalDate.now();
-//    private LocalDate updatedAt = LocalDate.now();
 }

@@ -16,9 +16,4 @@ public class Province {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
-//    private int code;
-//    private String status;
-//    private String createdBy;
-//    private LocalDate createdAt = LocalDate.now();
-//    private LocalDate updatedAt = LocalDate.now();
 }

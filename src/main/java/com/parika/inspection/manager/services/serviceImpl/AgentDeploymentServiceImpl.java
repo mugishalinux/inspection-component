@@ -4,25 +4,33 @@ import com.parika.inspection.manager.exceptions.ApiRequestException;
 import com.parika.inspection.manager.models.AgentDeployments;
 import com.parika.inspection.manager.models.FieldAgents;
 import com.parika.inspection.manager.models.ParkingArea;
+import com.parika.inspection.manager.models.Status;
 import com.parika.inspection.manager.repositories.AgentDeploymentsRepo;
 import com.parika.inspection.manager.repositories.FieldAgentsRepo;
 import com.parika.inspection.manager.repositories.ParkingAreaRepo;
+import com.parika.inspection.manager.repositories.StatusesRepo;
 import com.parika.inspection.manager.services.AgentDeploymentService;
 import com.parika.inspection.manager.util.AgentDeploymentInputHandle;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class AgentDeploymentServiceImpl implements AgentDeploymentService {
     private FieldAgentsRepo fieldAgentsRepo;
     private ParkingAreaRepo parkingAreaRepo;
     private AgentDeploymentsRepo agentDeploymentsRepo;
+    private StatusesRepo statusesRepo;
 
-    public AgentDeploymentServiceImpl(FieldAgentsRepo fieldAgentsRepo, ParkingAreaRepo parkingAreaRepo, AgentDeploymentsRepo agentDeploymentsRepo) {
+    public AgentDeploymentServiceImpl(FieldAgentsRepo fieldAgentsRepo, ParkingAreaRepo parkingAreaRepo, AgentDeploymentsRepo agentDeploymentsRepo, StatusesRepo statusesRepo) {
+        super();
         this.fieldAgentsRepo = fieldAgentsRepo;
         this.parkingAreaRepo = parkingAreaRepo;
         this.agentDeploymentsRepo = agentDeploymentsRepo;
+        this.statusesRepo = statusesRepo;
     }
 
     @Override
@@ -43,24 +51,48 @@ public class AgentDeploymentServiceImpl implements AgentDeploymentService {
 
             //check if parking id exist into database
             ParkingArea parkingAreaExist = parkingAreaRepo.findById(agentDeploymentInputHandle.getParkingId()).orElseThrow(()->new ApiRequestException("This Parking Area id don't exist in our database"));
+            //check if status id exist
+            Status status = statusesRepo.findById(agentDeploymentInputHandle.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
 
             AgentDeployments agentDeployments = new AgentDeployments();
             agentDeployments.setFieldAgents(fieldAgent);
             agentDeployments.setParkingAreaId(parkingAreaExist);
             agentDeployments.setDeploymentStartTime(LocalDateTime.now());
             agentDeployments.setDeploymentEndTime(LocalDateTime.now());
-            agentDeployments.setStatusId(agentDeploymentInputHandle.getStatusId());
-            agentDeployments.setCreatedAt(LocalDateTime.now());
+            agentDeployments.setStatus(status);
+            agentDeployments.setCreatedOnDt(LocalDateTime.now());
             agentDeployments.setCreatedBy(agentDeploymentInputHandle.getCreatedBy());
             agentDeployments.setUpdatedBy(agentDeploymentInputHandle.getCreatedBy());
-            agentDeployments.setUpdatedAt(LocalDateTime.now());
+            agentDeployments.setUpdatedOnDt(LocalDateTime.now());
             return agentDeploymentsRepo.save(agentDeployments);
         }
     }
 
     @Override
-    public List<AgentDeployments> getAllAgentDeployments() {
-        return agentDeploymentsRepo.findAll();
+    public Page<AgentDeployments> getAllAgentDeployments(Optional<Integer> fieldAgent, Optional<Integer> parkingAreaId, int page, int sizePage, String sortBy) {
+        if(fieldAgent.isPresent() && !parkingAreaId.isPresent()){
+            //check if field agent exist into database
+            FieldAgents fieldAgentExist = fieldAgentsRepo.findById(fieldAgent.get()).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
+            Pageable pageable = PageRequest.of(page, sizePage);
+            Slice<AgentDeployments> slicedResult = new PageImpl<>(agentDeploymentsRepo.findByFieldAgents(fieldAgentExist,pageable));
+            return new PageImpl<>(slicedResult.getContent());
+        } else if (!fieldAgent.isPresent() && parkingAreaId.isPresent()) {
+            //check if parking id exist into database
+            ParkingArea parkingAreaExist = parkingAreaRepo.findById(parkingAreaId.get()).orElseThrow(()->new ApiRequestException("This Parking Area id don't exist in our database"));
+            Pageable pageable = PageRequest.of(page, sizePage);
+            Slice<AgentDeployments> slicedResult = new PageImpl<>(agentDeploymentsRepo.findByParkingAreaId(parkingAreaExist,pageable));
+            return new PageImpl<>(slicedResult.getContent());
+        } else if (fieldAgent.isPresent() && parkingAreaId.isPresent()) {
+            //check if field agent exist into database
+            FieldAgents fieldAgentExist = fieldAgentsRepo.findById(fieldAgent.get()).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
+            //check if parking id exist into database
+            ParkingArea parkingAreaExist = parkingAreaRepo.findById(parkingAreaId.get()).orElseThrow(()->new ApiRequestException("This Parking Area id don't exist in our database"));
+            Pageable pageable = PageRequest.of(page, sizePage);
+            Slice<AgentDeployments> slicedResult = new PageImpl<>(agentDeploymentsRepo.findByFieldAgentsAndParkingAreaId(fieldAgentExist,parkingAreaExist,pageable));
+            return new PageImpl<>(slicedResult.getContent());
+        }else {
+            return agentDeploymentsRepo.findAll(PageRequest.of(page,sizePage , Sort.Direction.ASC ,sortBy));
+        }
     }
 
     @Override
@@ -89,16 +121,18 @@ public class AgentDeploymentServiceImpl implements AgentDeploymentService {
 
             //check if parking id exist into database
             ParkingArea parkingAreaExist = parkingAreaRepo.findById(agentDeploymentInputHandle.getParkingId()).orElseThrow(()->new ApiRequestException("This Parking Area id don't exist in our database"));
+            //check if status id exist
+            Status status = statusesRepo.findById(agentDeploymentInputHandle.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
 
             agentDeployments.setFieldAgents(fieldAgent);
             agentDeployments.setParkingAreaId(parkingAreaExist);
             agentDeployments.setDeploymentStartTime(agentDeployments.getDeploymentStartTime());
             agentDeployments.setDeploymentEndTime(agentDeployments.getDeploymentEndTime());
-            agentDeployments.setStatusId(agentDeploymentInputHandle.getStatusId());
+            agentDeployments.setStatus(status);
             agentDeployments.setCreatedBy(agentDeployments.getCreatedBy());
             agentDeployments.setUpdatedBy(agentDeploymentInputHandle.getUpdatedBy());
-            agentDeployments.setCreatedAt(agentDeployments.getCreatedAt());
-            agentDeployments.setUpdatedAt(LocalDateTime.now());
+            agentDeployments.setCreatedOnDt(agentDeployments.getCreatedOnDt());
+            agentDeployments.setUpdatedOnDt(LocalDateTime.now());
             return agentDeploymentsRepo.save(agentDeployments);
         }
     }

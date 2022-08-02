@@ -15,10 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @ToString
 @Table(name = "field_agents")
-public class FieldAgents {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+public class FieldAgents extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "profiles_id")
     private Profiles profiles;
@@ -27,14 +24,4 @@ public class FieldAgents {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private FieldAgentRole roleId;
-    @Column(name = "status_id")
-    private int statusId;
-    @Column(name = "created_by")
-    private String createdBy;
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-    @Column(name = "updated_by")
-    private String updatedBy;
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
 }
