@@ -1,9 +1,8 @@
-package com.parika.inspection.manager.util;
+package com.parika.inspection.manager.dto;
 
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 @Component
 @NoArgsConstructor
@@ -11,15 +10,9 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @ToString
-public class FieldAgentInputHandel {
-    private int id;
+public class FieldAgentDto {
     private String roleName;
     private int profileId;
     private LocalDateTime registrationDate;
     private int roleId;
-    private int statusId;
-    private String createdBy;
-    private LocalDateTime createdAt;
-    private String updatedBy;
-    private LocalDateTime updatedAt;
 }

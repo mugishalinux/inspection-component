@@ -7,12 +7,11 @@ import com.parika.inspection.manager.models.Profiles;
 import com.parika.inspection.manager.models.Status;
 import com.parika.inspection.manager.repositories.*;
 import com.parika.inspection.manager.services.FieldAgentService;
-import com.parika.inspection.manager.util.FieldAgentInputHandel;
+import com.parika.inspection.manager.dto.FieldAgentDto;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -31,38 +30,25 @@ public class FieldAgentServiceImpl implements FieldAgentService {
     }
 
     @Override
-    public FieldAgents createFieldAgents(FieldAgentInputHandel fieldAgentInputHandel) {
-
-        if(fieldAgentInputHandel.getProfileId() == 0){
-            throw new ApiRequestException("please provide the profile id");
-        } else if (fieldAgentInputHandel.getRoleId() == 0) {
-            throw new ApiRequestException("please provide the role id");
-        } else if (fieldAgentInputHandel.getStatusId() == 0) {
-            throw new ApiRequestException("please provide the status id");
-        } else if (fieldAgentInputHandel.getCreatedBy() == null) {
-            throw new ApiRequestException("please provide the creator name");
-        }else {
-
+    public FieldAgents createFieldAgents(FieldAgentDto fieldAgentDto) {
             //check if profile exist into database
-            Profiles profilesExist = profilesRepo.findById(fieldAgentInputHandel.getProfileId()).orElseThrow(()->new ApiRequestException("This Profile don't exist in our database"));
-
+            Profiles profilesExist = profilesRepo.findById(fieldAgentDto.getProfileId()).orElseThrow(()->new ApiRequestException("This Profile don't exist in our database"));
             //check if field agent role id exist into database
-            FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(fieldAgentInputHandel.getRoleId()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
-            //check if status id exist
-            Status status = statusesRepo.findById(fieldAgentInputHandel.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
-
-            FieldAgents fieldAgent = new FieldAgents();
-            fieldAgent.setProfiles(profilesExist);
-            fieldAgent.setRoleId(fieldAgentRoleExist);
-            fieldAgent.setRegistrationDate(LocalDateTime.now());
-            fieldAgent.setStatus(status);
-
-            fieldAgent.setCreatedBy(fieldAgentInputHandel.getCreatedBy());
-            fieldAgent.setUpdatedBy(fieldAgentInputHandel.getCreatedBy());
-            fieldAgent.setCreatedOnDt(LocalDateTime.now());
-            fieldAgent.setUpdatedOnDt(LocalDateTime.now());
-            return fieldAgentsRepo.save(fieldAgent);
-        }
+            FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(fieldAgentDto.getRoleId()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
+            try{
+                FieldAgents fieldAgent = new FieldAgents();
+                fieldAgent.setProfiles(profilesExist);
+                fieldAgent.setRoleId(fieldAgentRoleExist);
+                fieldAgent.setRegistrationDate(new Date());
+                fieldAgent.setStatus(null);
+                fieldAgent.setCreatedBy(null);
+                fieldAgent.setUpdatedBy(null);
+                fieldAgent.setCreatedOnDt(new Date());
+                fieldAgent.setUpdatedOnDt(new Date());
+                return fieldAgentsRepo.save(fieldAgent);
+            }catch (Exception e){
+                throw new ApiRequestException(e.getMessage());
+            }
     }
 
     @Override
@@ -98,45 +84,37 @@ public class FieldAgentServiceImpl implements FieldAgentService {
     }
 
     @Override
-    public FieldAgents updateFieldAgents(FieldAgentInputHandel fieldAgentInputHandel, int id) {
+    public FieldAgents updateFieldAgents(FieldAgentDto fieldAgentDto, int id) {
 
-        //check if field agent exist into database
-        FieldAgents fieldAgent = fieldAgentsRepo.findById(id).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
-
-        if(fieldAgentInputHandel.getProfileId() == 0){
-            throw new ApiRequestException("please provide the profile id");
-        } else if (fieldAgentInputHandel.getRoleId() == 0) {
-            throw new ApiRequestException("please provide the role id");
-        } else if (fieldAgentInputHandel.getStatusId() == 0) {
-            throw new ApiRequestException("please provide the status id");
-        } else if (fieldAgentInputHandel.getCreatedBy() == null) {
-            throw new ApiRequestException("please provide the creator name");
-        }else {
-
+             //check if field agent exist into database
+            FieldAgents fieldAgent = fieldAgentsRepo.findById(id).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
             //check if profile exist into database
-            Profiles profilesExist = profilesRepo.findById(fieldAgentInputHandel.getProfileId()).orElseThrow(()->new ApiRequestException("This Profile don't exist in our database"));
+            Profiles profilesExist = profilesRepo.findById(fieldAgentDto.getProfileId()).orElseThrow(()->new ApiRequestException("This Profile don't exist in our database"));
 
             //check if field agent role id exist into database
-            FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(fieldAgentInputHandel.getRoleId()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
-            //check if status id exist
-            Status status = statusesRepo.findById(fieldAgentInputHandel.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
-
+            FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(fieldAgentDto.getRoleId()).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
+        try{
             fieldAgent.setProfiles(profilesExist);
             fieldAgent.setRoleId(fieldAgentRoleExist);
-            fieldAgent.setRegistrationDate(fieldAgent.getCreatedOnDt());
-            fieldAgent.setStatus(status);
-
+            fieldAgent.setRegistrationDate(new Date());
+            fieldAgent.setStatus(null);
             fieldAgent.setCreatedBy(fieldAgent.getCreatedBy());
-            fieldAgent.setUpdatedBy(fieldAgentInputHandel.getUpdatedBy());
+            fieldAgent.setUpdatedBy(null);
             fieldAgent.setCreatedOnDt(fieldAgent.getCreatedOnDt());
-            fieldAgent.setUpdatedOnDt(LocalDateTime.now());
+            fieldAgent.setUpdatedOnDt(new Date());
             return fieldAgentsRepo.save(fieldAgent);
+        }catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
         }
     }
 
     @Override
     public void deleteFieldAgents(int id) {
         fieldAgentsRepo.findById(id).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
-        fieldAgentsRepo.deleteById(id);
+        try{
+            fieldAgentsRepo.deleteById(id);
+        }catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
+        }
     }
 }

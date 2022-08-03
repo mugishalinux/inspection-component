@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @MappedSuperclass
@@ -19,13 +19,13 @@ public abstract class BaseEntity implements Serializable{
     @JoinColumn(name = "status_id")
     private Status status;
     @Column(name = "created_on_at", nullable = false)
-//    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyy-MM-dd HH:mm:ss", timezone = "GMT+0")
-    private LocalDateTime createdOnDt;
+    private Date createdOnDt;
     @Column(name = "updated_on_dt", nullable = false )
-//    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyy-MM-dd HH:mm:ss", timezone = "GMT+0")
-    private LocalDateTime updatedOnDt;
+    private Date updatedOnDt;
     @Column(name = "createdBy", length = 90, nullable = true)
     private String createdBy;
     @Column(name = "updatedBy", length = 90, nullable = true)

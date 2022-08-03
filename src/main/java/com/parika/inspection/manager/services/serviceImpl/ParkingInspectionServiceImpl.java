@@ -8,12 +8,12 @@ import com.parika.inspection.manager.models.ParkingSlot;
 import com.parika.inspection.manager.models.Vehicle;
 import com.parika.inspection.manager.repositories.*;
 import com.parika.inspection.manager.services.ParkingInspectionService;
-import com.parika.inspection.manager.util.ParkingIspInputHandle;
+import com.parika.inspection.manager.dto.ParkingInspectionDto;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -34,57 +34,35 @@ public class ParkingInspectionServiceImpl implements ParkingInspectionService {
     }
 
     @Override
-    public ParkingInspections createParkingInspections(ParkingIspInputHandle parkingIspInputHandle) {
-
-        if(parkingIspInputHandle.getSlotId() == 0){
-            throw new ApiRequestException("please provide the parking slot id");
-        } else if (parkingIspInputHandle.getFieldAgentId() == 0) {
-            throw new ApiRequestException("please provide the field agent id");
-        } else if (parkingIspInputHandle.getVehicleId() == 0) {
-            throw new ApiRequestException("please provide the vehicle id");
-        } else if (parkingIspInputHandle.getIsSystemInitiated() == '\0') {
-            throw new ApiRequestException("please provide the status whether is system initiated");
-        } else if (parkingIspInputHandle.getStatusId() == 0) {
-            throw new ApiRequestException("please provide the status id");
-        } else if (parkingIspInputHandle.getCreatedBy() == null) {
-            throw new ApiRequestException("please provide the creator name");
-        }else {
+    public ParkingInspections createParkingInspections(ParkingInspectionDto parkingInspectionDto) {
 
             //check if parking slot id exist
-            ParkingSlot parkingSlot = parkingSlotRepo.findById(parkingIspInputHandle.getSlotId()).orElseThrow(()->new ApiRequestException("This parking slot id don't exist in our database"));
+            ParkingSlot parkingSlot = parkingSlotRepo.findById(parkingInspectionDto.getSlotId()).orElseThrow(()->new ApiRequestException("This parking slot id don't exist in our database"));
 
             //check if field agent exist into database
-            FieldAgents fieldAgent = fieldAgentsRepo.findById(parkingIspInputHandle.getFieldAgentId()).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
+            FieldAgents fieldAgent = fieldAgentsRepo.findById(parkingInspectionDto.getFieldAgentId()).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
 
             //check if vehicle id exist into database
-            Vehicle paVehicle = vehicleRepo.findById(parkingIspInputHandle.getVehicleId()).orElseThrow(()->new ApiRequestException("This Vehicle Id don't exist in our database"));
+            Vehicle paVehicle = vehicleRepo.findById(parkingInspectionDto.getVehicleId()).orElseThrow(()->new ApiRequestException("This Vehicle Id don't exist in our database"));
 
-            //check if status id exist
-            Status status = statusesRepo.findById(parkingIspInputHandle.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
-
-            String n = String.valueOf(parkingIspInputHandle.getIsSystemInitiated());
-
-            //check if is system initiated character is only one
-
-            if(n.length() > 1){
-                throw new ApiRequestException("is system initiated should be one character");
-            }else {
-                ParkingInspections parkingInspections = new ParkingInspections();
-                parkingInspections.setSlotId(parkingSlot);
-                parkingInspections.setFieldAgents(fieldAgent);
-                parkingInspections.setVehicle(paVehicle);
-                parkingInspections.setIsSystemInitiated(parkingIspInputHandle.getIsSystemInitiated());
-                parkingInspections.setInitiationTime(LocalDateTime.now());
-                parkingInspections.setInspectionTime(LocalDateTime.now());
-                parkingInspections.setInspectionCallTimeout(LocalDateTime.now());
-                parkingInspections.setStatus(status);
-                parkingInspections.setCreatedOnDt(LocalDateTime.now());
-                parkingInspections.setCreatedBy(parkingIspInputHandle.getCreatedBy());
-                parkingInspections.setUpdatedOnDt(LocalDateTime.now());
-                parkingInspections.setUpdatedBy(parkingIspInputHandle.getCreatedBy());
-                return parkingInspectionsRepo.save(parkingInspections);
-            }
-        }
+          try{
+              ParkingInspections parkingInspections = new ParkingInspections();
+              parkingInspections.setSlotId(parkingSlot);
+              parkingInspections.setFieldAgents(fieldAgent);
+              parkingInspections.setVehicle(paVehicle);
+              parkingInspections.setIsSystemInitiated(parkingInspectionDto.getIsSystemInitiated());
+              parkingInspections.setInitiationTime(LocalDateTime.now());
+              parkingInspections.setInspectionTime(LocalDateTime.now());
+              parkingInspections.setInspectionCallTimeout(LocalDateTime.now());
+              parkingInspections.setStatus(null);
+              parkingInspections.setCreatedOnDt(new Date());
+              parkingInspections.setCreatedBy(null);
+              parkingInspections.setUpdatedOnDt(new Date());
+              parkingInspections.setUpdatedBy(null);
+              return parkingInspectionsRepo.save(parkingInspections);
+          }catch (Exception e){
+              throw new ApiRequestException(e.getMessage());
+          }
     }
 
     @Override
@@ -130,63 +108,47 @@ public class ParkingInspectionServiceImpl implements ParkingInspectionService {
     }
 
     @Override
-    public ParkingInspections updateParkingInspections(ParkingIspInputHandle parkingIspInputHandle, int id) {
+    public ParkingInspections updateParkingInspections(ParkingInspectionDto parkingInspectionDto, int id) {
 
         //check if the Parking inspection id exist into db
         ParkingInspections parkingInspections = parkingInspectionsRepo.findById(id).orElseThrow(()->new ApiRequestException("This Parking Inspection Id don't exist in our database"));
 
-        if(parkingIspInputHandle.getSlotId() == 0){
-            throw new ApiRequestException("please provide the parking slot id");
-        } else if (parkingIspInputHandle.getFieldAgentId() == 0) {
-            throw new ApiRequestException("please provide the field agent id");
-        } else if (parkingIspInputHandle.getVehicleId() == 0) {
-            throw new ApiRequestException("please provide the vehicle id");
-        } else if (parkingIspInputHandle.getIsSystemInitiated() == '\0') {
-            throw new ApiRequestException("please provide the status whether is system initiated");
-        } else if (parkingIspInputHandle.getStatusId() == 0) {
-            throw new ApiRequestException("please provide the status id");
-        } else if (parkingIspInputHandle.getCreatedBy() == null) {
-            throw new ApiRequestException("please provide the creator name");
-        }else {
-
             //check if parking slot id exist
-            ParkingSlot parkingSlot = parkingSlotRepo.findById(parkingIspInputHandle.getSlotId()).orElseThrow(()->new ApiRequestException("This parking slot id don't exist in our database"));
+            ParkingSlot parkingSlot = parkingSlotRepo.findById(parkingInspectionDto.getSlotId()).orElseThrow(()->new ApiRequestException("This parking slot id don't exist in our database"));
 
             //check if field agent exist into database
-            FieldAgents fieldAgent = fieldAgentsRepo.findById(parkingIspInputHandle.getFieldAgentId()).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
+            FieldAgents fieldAgent = fieldAgentsRepo.findById(parkingInspectionDto.getFieldAgentId()).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
 
             //check if vehicle id exist into database
-            Vehicle paVehicle = vehicleRepo.findById(parkingIspInputHandle.getVehicleId()).orElseThrow(()->new ApiRequestException("This Vehicle Id don't exist in our database"));
+            Vehicle paVehicle = vehicleRepo.findById(parkingInspectionDto.getVehicleId()).orElseThrow(()->new ApiRequestException("This Vehicle Id don't exist in our database"));
             //check if status id exist
-            Status status = statusesRepo.findById(parkingIspInputHandle.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
+            Status status = statusesRepo.findById(parkingInspectionDto.getStatusId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
 
-            String n = String.valueOf(parkingIspInputHandle.getIsSystemInitiated());
+            String n = String.valueOf(parkingInspectionDto.getIsSystemInitiated());
 
-            //check if is system initiated character is only one
-
-            if(n.length() > 1){
-                throw new ApiRequestException("is system initiated should be one character");
-            }else {
                 parkingInspections.setSlotId(parkingSlot);
                 parkingInspections.setFieldAgents(fieldAgent);
                 parkingInspections.setVehicle(paVehicle);
-                parkingInspections.setIsSystemInitiated(parkingIspInputHandle.getIsSystemInitiated());
+                parkingInspections.setIsSystemInitiated(parkingInspectionDto.getIsSystemInitiated());
                 parkingInspections.setInitiationTime(LocalDateTime.now());
                 parkingInspections.setInspectionTime(LocalDateTime.now());
                 parkingInspections.setInspectionCallTimeout(LocalDateTime.now());
                 parkingInspections.setStatus(status);
                 parkingInspections.setCreatedOnDt(parkingInspections.getCreatedOnDt());
                 parkingInspections.setCreatedBy(parkingInspections.getCreatedBy());
-                parkingInspections.setUpdatedOnDt(LocalDateTime.now());
-                parkingInspections.setUpdatedBy(parkingIspInputHandle.getUpdatedBy());
+                parkingInspections.setUpdatedOnDt(new Date());
+                parkingInspections.setUpdatedBy(null);
                 return parkingInspectionsRepo.save(parkingInspections);
-            }
-        }
+
     }
 
     @Override
     public void deleteParkingInspections(int id) {
         parkingInspectionsRepo.findById(id).orElseThrow(()->new ApiRequestException("This Parking Inspection Id don't exist in our database"));
-        parkingInspectionsRepo.deleteById(id);
+        try{
+            parkingInspectionsRepo.deleteById(id);
+        }catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
+        }
     }
 }

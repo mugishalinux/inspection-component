@@ -1,18 +1,7 @@
 package com.parika.inspection.manager.services.serviceImpl;
 
-import com.parika.inspection.manager.exceptions.ApiRequestException;
-import com.parika.inspection.manager.models.FieldAgents;
-import com.parika.inspection.manager.models.FieldSupervision;
-import com.parika.inspection.manager.repositories.FieldAgentsRepo;
-import com.parika.inspection.manager.repositories.FieldSupervisionRepo;
 import com.parika.inspection.manager.services.FieldSupervisionService;
-import com.parika.inspection.manager.util.FieldAgentInputHandel;
-import com.parika.inspection.manager.util.FieldSupervisionInputHandle;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class FieldSupervisionServiceImpl implements FieldSupervisionService {
@@ -25,7 +14,7 @@ public class FieldSupervisionServiceImpl implements FieldSupervisionService {
 //    }
 //
 //    @Override
-//    public FieldSupervision createFieldSupervision(FieldSupervisionInputHandle fieldSupervisionInputHandle) {
+//    public FieldSupervision createFieldSupervision(FieldSupervisionDto fieldSupervisionInputHandle) {
 //
 //        if(fieldSupervisionInputHandle.getGetSuperviseId() == 0){
 //            throw new ApiRequestException("please provide list of people to be supervised id");
@@ -80,7 +69,7 @@ public class FieldSupervisionServiceImpl implements FieldSupervisionService {
 //    }
 //
 //    @Override
-//    public FieldSupervision updateFieldSupervision(FieldSupervisionInputHandle fieldSupervisionInputHandle, int id) {
+//    public FieldSupervision updateFieldSupervision(FieldSupervisionDto fieldSupervisionInputHandle, int id) {
 //
 //        FieldSupervision fieldSupervision = fieldSupervisionRepo.findById(id).orElseThrow(()->new ApiRequestException("This field supervision id don't exist in our database"));
 //

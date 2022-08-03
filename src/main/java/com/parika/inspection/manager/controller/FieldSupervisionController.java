@@ -1,16 +1,6 @@
 package com.parika.inspection.manager.controller;
 
-import com.parika.inspection.manager.models.FieldAgents;
-import com.parika.inspection.manager.models.FieldSupervision;
-import com.parika.inspection.manager.services.FieldSupervisionService;
-import com.parika.inspection.manager.util.FieldAgentInputHandel;
-import com.parika.inspection.manager.util.FieldSupervisionInputHandle;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin("*")
 @RestController
@@ -24,7 +14,7 @@ public class FieldSupervisionController {
 //    }
 //    @ApiOperation(value="Create a Field Supervision")
 //    @PostMapping("")
-//    public ResponseEntity<FieldSupervision> createFieldSupervision(@RequestBody FieldSupervisionInputHandle fieldSupervisionInputHandle){
+//    public ResponseEntity<FieldSupervision> createFieldSupervision(@RequestBody FieldSupervisionDto fieldSupervisionInputHandle){
 //        return new ResponseEntity<FieldSupervision>(fieldSupervisionService.createFieldSupervision(fieldSupervisionInputHandle), HttpStatus.CREATED);
 //    }
 //    @ApiOperation(value="Retrieve a list of Field Supervision")
@@ -40,7 +30,7 @@ public class FieldSupervisionController {
 //    }
 //    @ApiOperation(value="Update a Field Supervision by using ID")
 //    @PutMapping("/{id}")
-//    public ResponseEntity<FieldSupervision> updateFieldSupervision(@RequestBody FieldSupervisionInputHandle fieldSupervisionInputHandle, @PathVariable("id") int id){
+//    public ResponseEntity<FieldSupervision> updateFieldSupervision(@RequestBody FieldSupervisionDto fieldSupervisionInputHandle, @PathVariable("id") int id){
 //        return new ResponseEntity<FieldSupervision>(fieldSupervisionService.updateFieldSupervision(fieldSupervisionInputHandle,id),HttpStatus.OK);
 //    }
 //    @ApiOperation(value="Delete a Field Supervision by using ID")

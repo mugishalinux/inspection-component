@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 @Service
 public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
@@ -26,21 +27,14 @@ public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
 
     @Override
     public FieldAgentRole createFieldAgentRole(FieldAgentRole fieldAgentRole) {
-
-        if(fieldAgentRole.getRoleName() == null){
-            throw new ApiRequestException("please field agent name");
-        } else if (fieldAgentRole.getStatus() == null) {
-            throw new ApiRequestException("please provide the status id");
-        } else if (fieldAgentRole.getCreatedBy() == null) {
-            throw new ApiRequestException("please provide the creator name");
-        }else {
-            //check if status id exist
-            Status status = statusesRepo.findById(fieldAgentRole.getStatus().getId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
-            fieldAgentRole.setStatus(status);
+        try{
+            fieldAgentRole.setStatus(null);
             fieldAgentRole.setUpdatedBy(fieldAgentRole.getCreatedBy());
-            fieldAgentRole.setCreatedOnDt(LocalDateTime.now());
-            fieldAgentRole.setUpdatedOnDt(LocalDateTime.now());
+            fieldAgentRole.setCreatedOnDt(new Date());
+            fieldAgentRole.setUpdatedOnDt(new Date());
             return fieldAgentRoleRepository.save(fieldAgentRole);
+        }catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
         }
     }
 
@@ -59,29 +53,26 @@ public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
 
         //check if field agent role id exist into database
         FieldAgentRole fieldAgentRoleExist = fieldAgentRoleRepository.findById(id).orElseThrow(()->new ApiRequestException("This field agent role id don't exist in our database"));
-
-        if(fieldAgentRole.getRoleName() == null){
-            throw new ApiRequestException("please field agent name");
-        } else if (fieldAgentRole.getStatus() == null) {
-            throw new ApiRequestException("please provide the status id");
-        } else if (fieldAgentRole.getCreatedBy() == null) {
-            throw new ApiRequestException("please provide the creator name");
-        }else {
-            //check if status id exist
-            Status status = statusesRepo.findById(fieldAgentRole.getStatus().getId()).orElseThrow(()->new ApiRequestException("This Status don't exist in our database"));
+        try{
             fieldAgentRoleExist.setRoleName(fieldAgentRole.getRoleName());
-            fieldAgentRole.setStatus(status);
+            fieldAgentRole.setStatus(null);
             fieldAgentRoleExist.setCreatedBy(fieldAgentRoleExist.getCreatedBy());
             fieldAgentRoleExist.setUpdatedBy(fieldAgentRole.getUpdatedBy());
             fieldAgentRoleExist.setCreatedOnDt(fieldAgentRoleExist.getCreatedOnDt());
-            fieldAgentRoleExist.setUpdatedOnDt(LocalDateTime.now());
+            fieldAgentRoleExist.setUpdatedOnDt(new Date());
             return fieldAgentRoleRepository.save(fieldAgentRoleExist);
+        }catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
         }
     }
 
     @Override
     public void deleteFieldAgentRole(int id) {
         fieldAgentRoleRepository.findById(id).orElseThrow(()->new ApiRequestException("This field agent id don't exist in our database"));
-        fieldAgentRoleRepository.deleteById(id);
+        try {
+            fieldAgentRoleRepository.deleteById(id);
+        }catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
+        }
     }
 }

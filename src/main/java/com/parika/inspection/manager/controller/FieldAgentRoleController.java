@@ -2,12 +2,14 @@ package com.parika.inspection.manager.controller;
 
 import com.parika.inspection.manager.models.FieldAgentRole;
 import com.parika.inspection.manager.services.FieldAgentRoleService;
-import io.swagger.annotations.ApiOperation;
+import com.parika.inspection.manager.util.DeleteApiResponse;
+import com.parika.inspection.manager.util.PostApiResponse;
+import com.parika.inspection.manager.util.PutApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
-import java.util.List;
+
 
 @CrossOrigin("*")
 @RestController
@@ -19,12 +21,22 @@ public class FieldAgentRoleController {
         super();
         this.fieldAgentRoleService = fieldAgentRoleService;
     }
-    @ApiOperation(value="Create a Field Agent Role")
+
     @PostMapping("")
-    public ResponseEntity<FieldAgentRole> createFieldAgentRole(@RequestBody FieldAgentRole fieldAgentRole){
-        return new ResponseEntity< FieldAgentRole>(fieldAgentRoleService.createFieldAgentRole(fieldAgentRole), HttpStatus.CREATED);
+    public ResponseEntity<PostApiResponse> createFieldAgentRole(@RequestBody FieldAgentRole fieldAgentRole){
+        PostApiResponse response = new PostApiResponse();
+        try{
+            fieldAgentRoleService.createFieldAgentRole(fieldAgentRole);
+            response.setMessage("Successfully");
+            response.setResponseCode(HttpStatus.CREATED);
+            return new ResponseEntity<>(response,response.getResponseCode());
+        }catch (Exception e){
+            response.setMessage(e.getMessage());
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response,response.getResponseCode());
+        }
     }
-    @ApiOperation(value="Retrieve a list of Field Agent Role")
+
     @GetMapping()
     Page<FieldAgentRole> getAllFieldAgentRole(@RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "10") int sizePage,
@@ -32,20 +44,39 @@ public class FieldAgentRoleController {
         return fieldAgentRoleService.getAllFieldAgentRole(page,sizePage,sortBy);
     }
 
-    @ApiOperation(value="Retrieve single Field Agent Role by using ID")
+
     @GetMapping("/{id}")
     public FieldAgentRole getFieldAgentRoleById(@PathVariable("id") int id){
         return fieldAgentRoleService.getSingleFieldAgentRole(id);
     }
-    @ApiOperation(value="Update a Field Agent Role by using ID")
+
     @PutMapping("/{id}")
-    public ResponseEntity<FieldAgentRole> updateFieldAgentRole(@RequestBody FieldAgentRole fieldAgentRole , @PathVariable("id") int id){
-        return new ResponseEntity<FieldAgentRole>(fieldAgentRoleService.updateTariff(fieldAgentRole,id),HttpStatus.OK);
+    public ResponseEntity<PutApiResponse> updateFieldAgentRole(@RequestBody FieldAgentRole fieldAgentRole , @PathVariable("id") int id){
+        PutApiResponse response = new PutApiResponse();
+        try{
+            fieldAgentRoleService.updateTariff(fieldAgentRole,id);
+            response.setMessage("Successfully Updated");
+            response.setResponseCode(HttpStatus.OK);
+            return new ResponseEntity<>(response,response.getResponseCode());
+        }catch (Exception e){
+            response.setMessage(e.getMessage());
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response,response.getResponseCode());
+        }
     }
-    @ApiOperation(value="Delete a Field Agent Role by using ID")
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFieldAgentRole(@PathVariable("id") int id){
-        fieldAgentRoleService.deleteFieldAgentRole(id);
-        return new ResponseEntity<String>("Field Agent Role deletion successfully!!!",HttpStatus.OK);
+    public ResponseEntity<DeleteApiResponse> deleteFieldAgentRole(@PathVariable("id") int id){
+        DeleteApiResponse response = new DeleteApiResponse();
+        try{
+            fieldAgentRoleService.deleteFieldAgentRole(id);
+            response.setMessage("Field Agent Role Deleted");
+            response.setResponseCode(HttpStatus.OK);
+            return new ResponseEntity<>(response,response.getResponseCode());
+        }catch (Exception e){
+            response.setMessage(e.getMessage());
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response,response.getResponseCode());
+        }
     }
 }

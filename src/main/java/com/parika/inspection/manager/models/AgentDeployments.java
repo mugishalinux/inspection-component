@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -17,12 +18,13 @@ import java.time.LocalTime;
 @Table(name = "agent_deployments")
 public class AgentDeployments extends BaseEntity{
     @ManyToOne
-    @JoinColumn(name = "field_agent_id")
+    @Size(min = 1, max = 10, message = "Field AGENT ID should not be empty, null and or length exceed 10")
+    @JoinColumn(name = "field_agent_id", nullable = false)
     private FieldAgents fieldAgents;
     @ManyToOne
-    @JoinColumn(name = "parking_area_id")
+    @Size(min = 1, max = 10, message = "PARKING AREA ID should not be empty, null and or length exceed 10")
+    @JoinColumn(name = "parking_area_id", nullable = false)
     private ParkingArea parkingAreaId;
-
     @Column(name = "deployment_start_time")
     private LocalDateTime deploymentStartTime;
     @Column(name = "deployment_end_time")

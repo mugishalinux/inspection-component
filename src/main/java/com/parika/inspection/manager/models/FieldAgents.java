@@ -4,8 +4,10 @@ import lombok.*;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Component
 @NoArgsConstructor
@@ -17,11 +19,13 @@ import java.time.LocalDateTime;
 @Table(name = "field_agents")
 public class FieldAgents extends BaseEntity{
     @ManyToOne
-    @JoinColumn(name = "profiles_id")
+    @Size(min = 1, max = 10, message = "PROFILE ID should not be empty or null")
+    @JoinColumn(name = "profiles_id", nullable = false)
     private Profiles profiles;
-    @Column(name = "registration_date")
-    private LocalDateTime registrationDate;
+    @Column(name = "registration_date", nullable = false)
+    private Date registrationDate;
     @ManyToOne
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id",nullable = false)
+    @Size(min = 1, max = 10, message = "PROFILE ID should not be empty or null")
     private FieldAgentRole roleId;
 }
