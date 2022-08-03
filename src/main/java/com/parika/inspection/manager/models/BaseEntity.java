@@ -2,10 +2,12 @@ package com.parika.inspection.manager.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @MappedSuperclass
@@ -13,8 +15,9 @@ public abstract class BaseEntity implements Serializable{
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "id", length = 255, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2" , strategy = "org.hibernate.id.UUIDGenerator")
+    private String id;
     @ManyToOne
     @JoinColumn(name = "status_id")
     private Status status;
@@ -34,7 +37,7 @@ public abstract class BaseEntity implements Serializable{
     public BaseEntity() {
     }
 
-    public BaseEntity(int id) {
+    public BaseEntity(String id) {
         this.id = id;
     }
 }

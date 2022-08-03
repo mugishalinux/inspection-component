@@ -7,8 +7,11 @@ import com.parika.inspection.manager.util.PostApiResponse;
 import com.parika.inspection.manager.util.PutApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
+
+import javax.validation.Valid;
 
 
 @CrossOrigin("*")
@@ -23,7 +26,7 @@ public class FieldAgentRoleController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PostApiResponse> createFieldAgentRole(@RequestBody FieldAgentRole fieldAgentRole){
+    public ResponseEntity<PostApiResponse> createFieldAgentRole(@RequestBody @Valid  FieldAgentRole fieldAgentRole, BindingResult result){
         PostApiResponse response = new PostApiResponse();
         try{
             fieldAgentRoleService.createFieldAgentRole(fieldAgentRole);
@@ -31,7 +34,8 @@ public class FieldAgentRoleController {
             response.setResponseCode(HttpStatus.CREATED);
             return new ResponseEntity<>(response,response.getResponseCode());
         }catch (Exception e){
-            response.setMessage(e.getMessage());
+            System.out.println("Controller Level");
+            response.setMessage(result.toString());
             response.setResponseCode(HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(response,response.getResponseCode());
         }

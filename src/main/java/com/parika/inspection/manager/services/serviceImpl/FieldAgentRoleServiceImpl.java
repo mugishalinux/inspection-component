@@ -34,7 +34,8 @@ public class FieldAgentRoleServiceImpl implements FieldAgentRoleService {
             fieldAgentRole.setUpdatedOnDt(new Date());
             return fieldAgentRoleRepository.save(fieldAgentRole);
         }catch (Exception e){
-            throw new ApiRequestException(e.getMessage());
+            System.out.println("Service Level");
+            throw new ApiRequestException(e.toString());
         }
     }
 
